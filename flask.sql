@@ -73,6 +73,6 @@ CREATE TABLE IF NOT EXISTS Student (
                 course VARCHAR(50) NOT NULL,
                 year VARCHAR(10) NOT NULL,
                 gender VARCHAR(20) NOT NULL,
-                image_url VARCHAR(70) NOT NULL,
+                image_url VARCHAR(255) NOT NULL,
                 CONSTRAINT fk2 FOREIGN KEY (course) REFERENCES course (code) ON DELETE CASCADE ON UPDATE CASCADE
 );
