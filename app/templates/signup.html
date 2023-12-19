@@ -1,0 +1,18 @@
+{% import "bootstrap/wtf.html" as wtf %}
+{% extends "layout.html" %}
+{% block content %}
+<div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item active" aria-current="page">
+                    <a href="{{ url_for('.college') }}">Users</a>
+                </li>
+            </ol>
+        </nav>
+        <div class="row">
+            <div class="col">
+                {{ wtf.quick_form(form, url_for('.register'),"post") }}
+            </div>
+        </div>
+</div>
+{% endblock %}

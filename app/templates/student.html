@@ -1,0 +1,227 @@
+{% extends "layout.html" %}
+{% include 'navbar.html' %}
+
+{% block content %}
+    <div class="container">
+        <div class="col text-center">
+            <div class="col m-4">
+                <h1>Student</h1>
+            </div>
+            
+            <div class="col-md-5 m-2 mx-auto text-center">
+                <form method="GET" action="{{ url_for('.search_student') }}" class="d-flex">
+                    <div class="input-group mb-3 me-3 w-75 p-0">
+                        <label class="input-group-text" for="filter_by">Filter by</label>
+                        <select class="form-select form-control-sm" id="filter_by" name="filter_by">
+                            <option value="id">ID</option>
+                            <option value="firstname">First Name</option>
+                            <option value="lastname">Last Name</option>
+                            <option value="course">Course</option>
+                            <option value="year">Year</option>
+                            <option value="gender">Gender</option>
+                            <option value="college">College</option>
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                        <input class="form-control me-2" type="text" name="search" autocomplete="off" placeholder="Search" aria-label="Search">
+                        <div class="input-group-append">
+                            <button class="btn btn-primary" type="submit">Search</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        <div class="row mb-4">
+            <div class="col text-center">
+                <span class="btn btn-primary float-right" data-bs-toggle="modal" data-bs-target="#Student_Add_Modal" id="addBtn">Add Student</span>
+            </div>
+        </div>
+
+        {% with messages = get_flashed_messages() %}
+        
+        {% if messages%}
+        
+        {% for message in messages%}
+        <div class="alert alert-success alert-dismissable" role="alert">
+            {{ message }}
+
+            <button type="button" class="btn btn-transparent pull-right close" data-dismiss="alert" aria-label="close">
+
+                <span aria-hidden="true">&times;</span>
+                
+            </button>
+
+        </div>
+        {% endfor %}
+
+        {% endif%}
+
+        {% endwith %}
+
+        <div class="row mt-2">
+            <table class="table table-light text-center">
+                <thead>
+                <tr class="table-primary">
+                    <th>ID</th>
+                    <th>Firstname</th>
+                    <th>Lastname</th>
+	                <th>Course</th>
+	                <th>Year</th>
+	                <th>Gender</th>
+	                <th>Option</th>
+                </tr>
+	            </thead>
+	            <tbody>
+		        {% for student in students %}
+		            <tr>
+			            <td>{{student.id }}</td>
+                        <td>{{student.firstname }}</td>
+                        <td>{{student.lastname }}</td>
+                        <td>{{student.course }}</td>
+                        <td>{{student.year }}</td>
+                        <td>{{student.gender }}</td>
+                        <td>
+                            <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#UpdateStudentModal{{ student.id }}">Edit</button> 
+                            <button class="btn btn-danger btn-delete" onclick="confirmDeleteStudent(this)" student-id="{{ student.id }}" csrf-token="{{ csrf_token() }}">Delete</button>
+                        </td>
+		            </tr>
+		        {% endfor %}
+	            </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    <!-- Add Modal (Student) -->
+    <div class="modal fade" id="Student_Add_Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add Student</h5>
+                </div>
+                <div class="modal-body">
+
+                    <!-- Pagination Container -->
+                    <div class="pagination-container">
+                        <!-- Form Starts Here -->
+                        <form method="POST" action="{{ url_for('.student') }}" id="student_form" enctype="multipart/form-data">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    
+                            
+                                <div class="form-group mb-3">
+                                    <label for="id">Student ID</label>
+                                    <input type="text" class="form-control" id="id" name="id" autocomplete="off" placeholder="20XX-XXXX" pattern="20\d{2}-\d{4}" required>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label for="firstName">First Name</label>
+                                    <input type="text" class="form-control" id="firstName" name="firstname" autocomplete="off" placeholder="e.g Ethan" required>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label for="lastName">Last Name</label>
+                                    <input type="text" class="form-control" id="lastName" name="lastname" autocomplete="off" placeholder="e.g Grunt" required>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label for="course">Course</label>
+                                    <select class="form-select" id="course" name="course" required>
+                                        <option disabled selected value="">--Select Course--</option>
+                                        {% for course in courses %}
+                                            <option value="{{ course.code }}">{{ course.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label for="year">Year</label>
+                                    <select class="form-select" id="year" name="year" required>
+                                        <option disabled selected value="">--Select Year--</option>
+                                        <option value="1st year">1st year</option>
+                                        <option value="2nd year">2nd year</option>
+                                        <option value="3rd year">3rd year</option>
+                                        <option value="4th year">4th year</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label for="gender">Gender</label>
+                                    <select class="form-select" id="gender" name="gender" required>
+                                        <option disabled selected value="">--Select Gender--</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                        <option value="Other">Other</option>   
+                                    </select>
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button type="submit" form="student_form"class="btn btn-primary">Add</button>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% for student in students %}
+    <div class="modal fade" id="UpdateStudentModal{{ student.id }}" tabindex="-1" role="dialog" aria-labelledby="UpdateStudentModalLabel{{ student.id }}" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="UpdateStudentModalLabel{{ student.id }}">Edit Student</h5>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="{{ url_for('.update_student', student_id=student.id) }}" enctype="multipart/form-data">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="form-group">
+                            <label for="update_id">Student ID</label>
+                            <input type="text" class="form-control" id="update_id" name="id" value="{{ student.id }}" pattern="20\d{2}-\d{4}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="update_firstname">First Name</label>
+                            <input type="text" class="form-control" id="update_firstname" name="firstname" value="{{ student.firstname }}" required>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="update_lastname">Last Name</label>
+                            <input type="text" class="form-control" id="update_lastname" name="lastname" value="{{ student.lastname }}" required>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="update_course">Course</label>
+                            <select class="form-select" id="update_course" name="course" required>
+                                <option disabled selected value="">--Select Course--</option>
+                                {% for course in courses %}
+                                    <option value="{{ course.code }}" {% if course.code == student.course %}selected{% endif %}>{{ course.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="update_year">Year</label>
+                            <select class="form-select" id="update_year" name="year" required>
+                                <option disabled selected value="">--Select Year--</option>
+                                <option value="1st year" {% if student.year == "1st year" %}selected{% endif %}>1st year</option>
+                                <option value="2nd year" {% if student.year == "2nd year" %}selected{% endif %}>2nd year</option>
+                                <option value="3rd year" {% if student.year == "3rd year" %}selected{% endif %}>3rd year</option>
+                                <option value="4th year" {% if student.year == "4th year" %}selected{% endif %}>4th year</option>
+                                <option value="Other" {% if student.year == "Other" %}selected{% endif %}>Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="update_gender">Gender</label>
+                            <select class="form-select" id="update_gender" name="gender" required>
+                                <option disabled selected value="">--Select Gender--</option>
+                                <option value="Male" {% if student.gender == "Male" %}selected{% endif %}>Male</option>
+                                <option value="Female" {% if student.gender == "Female" %}selected{% endif %}>Female</option>
+                                <option value="Other" {% if student.gender == "Other" %}selected{% endif %}>Other</option>
+                            </select>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">Update</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+
+
+{% endblock %}
