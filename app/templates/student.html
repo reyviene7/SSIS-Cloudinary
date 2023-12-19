@@ -61,6 +61,7 @@
             <table class="table table-light text-center">
                 <thead>
                 <tr class="table-primary">
+                    <th></th>
                     <th>ID</th>
                     <th>Firstname</th>
                     <th>Lastname</th>
@@ -73,6 +74,8 @@
 	            <tbody>
 		        {% for student in students %}
 		            <tr>
+                        <td><img src="{{ student.image_url }}" alt="Student Image" class="student-image" width="50px">
+                        </td>
 			            <td>{{student.id }}</td>
                         <td>{{student.firstname }}</td>
                         <td>{{student.lastname }}</td>
@@ -102,11 +105,10 @@
 
                     <!-- Pagination Container -->
                     <div class="pagination-container">
-                        <!-- Form Starts Here -->
                         <form method="POST" action="{{ url_for('.student') }}" id="student_form" enctype="multipart/form-data">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     
-                            
+                            <div class="page" id="page1">
                                 <div class="form-group mb-3">
                                     <label for="id">Student ID</label>
                                     <input type="text" class="form-control" id="id" name="id" autocomplete="off" placeholder="20XX-XXXX" pattern="20\d{2}-\d{4}" required>
@@ -148,11 +150,25 @@
                                         <option value="Other">Other</option>   
                                     </select>
                                 </div>
-
                                 <div class="modal-footer">
-                                    <button type="submit" form="student_form"class="btn btn-primary">Add</button>
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-primary" onclick="showPage(2)">Next</button>
                                 </div>
+                            </div>
+                            <!-- Page 2: Image Input -->
+                            <div class="page" id="page2" style="display: none;">
+                                <div class="mb-3 text-center">
+                                    <label for="image">Image</label>
+                                </div>
+                                <div class="mb-3 d-flex justify-content-center align-items-center flex-column">
+                                    <!-- Display default user image -->
+                                    <img src="https://res.cloudinary.com/dzwjjpvdb/image/upload/v1702977617/SSIS_CLOUDINARY/user_profile_fcfymn.jpg" alt="Student Image" class="img-thumbnail mb-3" width="100px">
+                                    <input type="file" class="form-control" id="image" name="image">
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" class="btn btn-primary">Add</button>
+                                    <button type="button" class="btn btn-secondary" onclick="showPage(1)">Previous</button>
+                                </div>
+                            </div>
                         </form>
                     </div>
                 </div>
@@ -170,6 +186,7 @@
                 <div class="modal-body">
                     <form method="POST" action="{{ url_for('.update_student', student_id=student.id) }}" enctype="multipart/form-data">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="page" id="page1">
                         <div class="form-group">
                             <label for="update_id">Student ID</label>
                             <input type="text" class="form-control" id="update_id" name="id" value="{{ student.id }}" pattern="20\d{2}-\d{4}" required>
@@ -212,9 +229,23 @@
                             </select>
                         </div>
                         <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" onclick="showPage(2)">Next</button>
+                        </div>
+                    </div>
+                    <div class="page" id="page2" style="display: none;">
+                        <div class="mb-3 text-center">
+                            <label for="update_image">Image</label>
+                        </div>
+                        <div class="mb-3 d-flex justify-content-center align-items-center flex-column">
+                            <!-- Display existing user image -->
+                            <img src="{{ student.image_url }}" alt="Student Image" class="img-thumbnail mb-3" width="100px">
+                            <input type="file" class="form-control" id="update_image" name="image">
+                        </div>
+                        <div class="modal-footer">
                             <button type="submit" class="btn btn-primary">Update</button>
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         </div>
+                    </div>
                     </form>
                 </div>
             </div>
@@ -222,6 +253,67 @@
     </div>
     {% endfor %}
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Function to handle both "Next" and "Previous" buttons
+            function handlePageNavigation(button, increment) {
+                var modal = button.closest('.modal');
+                var currentPage = parseInt(modal.getAttribute('data-page')) || 1; // Default to 1 if not set
+                var nextPage = currentPage + increment;
+    
+                showPage(modal, nextPage);
+                modal.setAttribute('data-page', nextPage);
+            }
+    
+            // Function to reset modal to page 1 when opened
+            function resetModal(modal) {
+                var nextButtons = modal.querySelectorAll('.modal-footer .btn-primary');
+                nextButtons.forEach(function (button) {
+                    button.setAttribute('data-page', '1');
+                });
+    
+                showPage(modal, 1);
+            }
+    
+            // Function to show a specific page in a modal
+            function showPage(modal, pageNumber) {
+                var pages = modal.getElementsByClassName('page');
+    
+                for (var i = 0; i < pages.length; i++) {
+                    pages[i].style.display = 'none';
+                }
+    
+                pages[pageNumber - 1].style.display = 'block';
+            }
+    
+            // Call this function to show the first page when the Add modal is opened
+            showPage(document.getElementById('Student_Add_Modal'), 1);
+    
+            // Add an event listener for each Update modal
+            var updateModals = document.querySelectorAll('[id^="UpdateStudentModal"]');
+            updateModals.forEach(function (modal) {
+                modal.addEventListener('show.bs.modal', function () {
+                    resetModal(modal);
+                });
+            });
+    
+            // Add an event listener for the "Next" button in each modal
+            var nextButtons = document.querySelectorAll('.modal-footer .btn-primary');
+            nextButtons.forEach(function (button) {
+                button.addEventListener('click', function () {
+                    handlePageNavigation(button, 1);
+                });
+            });
+    
+            // Add an event listener for the "Previous" button in each modal
+            var prevButtons = document.querySelectorAll('.modal-footer .btn-secondary');
+            prevButtons.forEach(function (button) {
+                button.addEventListener('click', function () {
+                    handlePageNavigation(button, -1);
+                });
+            });
+        });
+    </script>
 
 
 {% endblock %}

@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS Student (
                 id VARCHAR(20) NOT NULL PRIMARY KEY,
                 firstname VARCHAR(50) NOT NULL,
                 lastname VARCHAR(50) NOT NULL,
-                course VARCHAR(30) NOT NULL,
+                course VARCHAR(50) NOT NULL,
                 year VARCHAR(10) NOT NULL,
                 gender VARCHAR(20) NOT NULL,
                 image_url VARCHAR(70) NOT NULL,
