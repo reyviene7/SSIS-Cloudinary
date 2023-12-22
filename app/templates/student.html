@@ -19,7 +19,6 @@
                             <option value="course">Course</option>
                             <option value="year">Year</option>
                             <option value="gender">Gender</option>
-                            <option value="college">College</option>
                         </select>
                     </div>
                     <div class="input-group mb-3">
@@ -41,7 +40,7 @@
         {% if messages%}
         
         {% for message in messages%}
-        <div class="alert alert-success alert-dismissable" role="alert">
+        <div class="alert alert-success alert-dismissable d-flex justify-content-between" role="alert">
             {{ message }}
 
             <button type="button" class="btn btn-transparent pull-right close" data-dismiss="alert" aria-label="close">
@@ -93,8 +92,6 @@
         </div>
     </div>
 
-
-    <!-- Add Modal (Student) -->
     <div class="modal fade" id="Student_Add_Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -103,7 +100,6 @@
                 </div>
                 <div class="modal-body">
 
-                    <!-- Pagination Container -->
                     <div class="pagination-container">
                         <form method="POST" action="{{ url_for('.student') }}" id="student_form" enctype="multipart/form-data">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -111,15 +107,15 @@
                             <div class="page" id="page1">
                                 <div class="form-group mb-3">
                                     <label for="id">Student ID</label>
-                                    <input type="text" class="form-control" id="id" name="id" autocomplete="off" placeholder="20XX-XXXX" pattern="20\d{2}-\d{4}" required>
+                                    <input type="text" class="form-control" id="id" name="id" autocomplete="off" placeholder="2020-0001" pattern="20\d{2}-\d{4}" required>
                                 </div>
                                 <div class="form-group mb-3">
                                     <label for="firstName">First Name</label>
-                                    <input type="text" class="form-control" id="firstName" name="firstname" autocomplete="off" placeholder="e.g Ethan" required>
+                                    <input type="text" class="form-control" id="firstName" name="firstname" autocomplete="off" placeholder="Rey Viene Dean" required>
                                 </div>
                                 <div class="form-group mb-3">
                                     <label for="lastName">Last Name</label>
-                                    <input type="text" class="form-control" id="lastName" name="lastname" autocomplete="off" placeholder="e.g Grunt" required>
+                                    <input type="text" class="form-control" id="lastName" name="lastname" autocomplete="off" placeholder="Pasiculan" required>
                                 </div>
                                 <div class="form-group mb-3">
                                     <label for="course">Course</label>
@@ -154,13 +150,11 @@
                                     <button type="button" class="btn btn-primary" onclick="showPage(2)">Next</button>
                                 </div>
                             </div>
-                            <!-- Page 2: Image Input -->
                             <div class="page" id="page2" style="display: none;">
                                 <div class="mb-3 text-center">
                                     <label for="image">Image</label>
                                 </div>
                                 <div class="mb-3 d-flex justify-content-center align-items-center flex-column">
-                                    <!-- Display default user image -->
                                     <img src="https://res.cloudinary.com/dzwjjpvdb/image/upload/v1702977617/SSIS_CLOUDINARY/user_profile_fcfymn.jpg" alt="Student Image" class="img-thumbnail mb-3" width="100px">
                                     <input type="file" class="form-control" id="image" name="image">
                                 </div>
@@ -237,7 +231,6 @@
                             <label for="update_image">Image</label>
                         </div>
                         <div class="mb-3 d-flex justify-content-center align-items-center flex-column">
-                            <!-- Display existing user image -->
                             <img src="{{ student.image_url }}" alt="Student Image" class="img-thumbnail mb-3" width="100px">
                             <input type="file" class="form-control" id="update_image" name="image">
                         </div>
@@ -255,17 +248,15 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Function to handle both "Next" and "Previous" buttons
             function handlePageNavigation(button, increment) {
                 var modal = button.closest('.modal');
-                var currentPage = parseInt(modal.getAttribute('data-page')) || 1; // Default to 1 if not set
+                var currentPage = parseInt(modal.getAttribute('data-page')) || 1; 
                 var nextPage = currentPage + increment;
     
                 showPage(modal, nextPage);
                 modal.setAttribute('data-page', nextPage);
             }
     
-            // Function to reset modal to page 1 when opened
             function resetModal(modal) {
                 var nextButtons = modal.querySelectorAll('.modal-footer .btn-primary');
                 nextButtons.forEach(function (button) {
@@ -275,7 +266,6 @@
                 showPage(modal, 1);
             }
     
-            // Function to show a specific page in a modal
             function showPage(modal, pageNumber) {
                 var pages = modal.getElementsByClassName('page');
     
@@ -286,10 +276,8 @@
                 pages[pageNumber - 1].style.display = 'block';
             }
     
-            // Call this function to show the first page when the Add modal is opened
             showPage(document.getElementById('Student_Add_Modal'), 1);
     
-            // Add an event listener for each Update modal
             var updateModals = document.querySelectorAll('[id^="UpdateStudentModal"]');
             updateModals.forEach(function (modal) {
                 modal.addEventListener('show.bs.modal', function () {
@@ -297,7 +285,6 @@
                 });
             });
     
-            // Add an event listener for the "Next" button in each modal
             var nextButtons = document.querySelectorAll('.modal-footer .btn-primary');
             nextButtons.forEach(function (button) {
                 button.addEventListener('click', function () {
@@ -305,7 +292,6 @@
                 });
             });
     
-            // Add an event listener for the "Previous" button in each modal
             var prevButtons = document.querySelectorAll('.modal-footer .btn-secondary');
             prevButtons.forEach(function (button) {
                 button.addEventListener('click', function () {

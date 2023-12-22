@@ -38,7 +38,7 @@
         {% if messages%}
         
         {% for message in messages%}
-        <div class="alert alert-success alert-dismissable" role="alert">
+        <div class="alert alert-success alert-dismissable d-flex justify-content-between" role="alert">
             {{ message }}
 
             <button type="button" class="btn btn-transparent pull-right close" data-dismiss="alert" aria-label="close">
@@ -69,7 +69,7 @@
 		            <tr>
 			            <td>{{ course.code }}</td>
 			            <td>{{ course.name }}</td>
-			            <td>{{ course.college }}</td>
+			            <td>{{ course.College }}</td>
                         <td>
                             <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#UpdateCourseModal{{ course.code }}">Edit</button> 
                             <button class="btn btn-danger btn-delete" onclick="confirmDeleteCourse(this)" course-code="{{ course.code }}" csrf-token="{{ csrf_token() }}">Delete</button>
@@ -81,8 +81,6 @@
         </div>
     </div>
 
-
-    <!-- Add Modal (Course) -->
     <div class="modal fade" id="Course_Add_Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -94,15 +92,15 @@
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <div class="form-group">
                             <label for="courseCode">Course Code</label>
-                            <input type="text" class="form-control" id="code" name="code" autocomplete="off" placeholder="Enter Course Code">
+                            <input type="text" class="form-control" id="code" name="code" autocomplete="off" placeholder="Enter Course Code" required>
                         </div>
                         <div class="form-group">
                             <label for "courseName">Name of Course</label>
-                            <input type="text" class="form-control" id="name" name="name" autocomplete="off" placeholder="Enter Name of Course">
+                            <input type="text" class="form-control" id="name" name="name" autocomplete="off" placeholder="Enter Name of Course" required>
                         </div>
                         <div class="form-group">
                             <label for="courseCollege">College</label>
-                            <select class="form-control" id="college" name="college">
+                            <select class="form-control" id="college" name="college" required>
                                 <option disabled selected>--Select College--</option>
                                 {% for college in colleges %}
                                     <option value="{{ college.name }}">{{ college.name }}</option>
@@ -119,7 +117,6 @@
         </div>  
     </div>
 
-    <!-- Update Modal (Course) -->
     {% for course in courses %}
     <div class="modal fade" id="UpdateCourseModal{{ course.code }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -157,7 +154,5 @@
         </div>
     </div>
     {% endfor %}
-
-    
 
 {% endblock %}

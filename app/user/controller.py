@@ -14,9 +14,14 @@ def college_db():
     if request.method == 'POST':
         code = request.form.get('code')
         name = request.form.get('name')
+        
+        if not code or not name:
+            flash('Please fill in all fields.')
+            return redirect(url_for('user.college_db'))
+        
         m_college.create(code, name)
         flash('College created Successfully!')
-        return redirect(url_for('user.college'))
+        return redirect(url_for('user.college_db'))
 
     colleges = m_college.get_colleges()     
     print(colleges)
@@ -36,7 +41,7 @@ def update_college(college_code):
         new_code = request.form.get('code')
         new_name = request.form.get('name')
         m_college.update_college(college_code, new_code, new_name)
-        return redirect(url_for('user.college'))
+        return redirect(url_for('user.college_db'))
     college = m_college.get_college_by_code(college_code)
     return render_template('college.html', college=college)
      
@@ -78,8 +83,10 @@ def course():
         name = request.form.get('name')
         college = request.form.get('college')
         
-        print(f"Received data - Code: {code}, Name: {name}, College: {college}")
-
+        if not code or not name or not college:
+            flash('Please fill in all fields.')
+            return redirect(url_for('user.course'))
+        
         m_course.create_course(code, name, college)
         flash('Course created Successfully!')
         return redirect(url_for('user.course'))
@@ -154,7 +161,6 @@ def student():
             image_url = default_image_url
             
         m_student.add_student(id, firstname, lastname, course, year, gender, image_url)
-        print(f"Received data - id: {id}, Name: {firstname} {lastname}, Course: {course}, Year: {year}, Gender: {gender} ")
 
     students = m_student.get_students()
     print(students)

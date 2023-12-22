@@ -53,24 +53,25 @@ CREATE TABLE IF NOT EXISTS `user_info` (
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40111 SET SQL_NOTES=IFNULL(@OLD_SQL_NOTES, 1) */;
 
-CREATE TABLE IF NOT EXISTS college (
-                code VARCHAR(15) NOT NULL PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS College (
+                code VARCHAR(5) NOT NULL PRIMARY KEY,
                 name VARCHAR(50) NOT NULL
 )
 
+CREATE INDEX College ON College (name);
 
 CREATE TABLE IF NOT EXISTS Course (
-                code VARCHAR(20) NOT NULL PRIMARY KEY,
-                name VARCHAR(50) NOT NULL,
-                college VARCHAR(50) NOT NULL,
-                CONSTRAINT fk1 FOREIGN KEY (college) REFERENCES college (name) ON DELETE CASCADE ON UPDATE CASCADE
+                code VARCHAR(10) NOT NULL PRIMARY KEY,
+                name VARCHAR(80) NOT NULL,
+                College VARCHAR(50) NOT NULL,
+                CONSTRAINT fk1 FOREIGN KEY (College) REFERENCES College (name) ON DELETE CASCADE ON UPDATE CASCADE
 )
 
 CREATE TABLE IF NOT EXISTS Student (
                 id VARCHAR(20) NOT NULL PRIMARY KEY,
                 firstname VARCHAR(50) NOT NULL,
                 lastname VARCHAR(50) NOT NULL,
-                course VARCHAR(50) NOT NULL,
+                course VARCHAR(80) NOT NULL,
                 year VARCHAR(10) NOT NULL,
                 gender VARCHAR(20) NOT NULL,
                 image_url VARCHAR(255) NOT NULL,

@@ -65,7 +65,6 @@ class m_college(object):
         try:
             cur = mysql.new_cursor(dictionary=True)
             cur.execute("DELETE FROM college WHERE code = %s", (college_code,))
-            print(f"DELETE FROM college WHERE code = {college_code}")
             mysql.connection.commit()
             cur.close()
             return "College deleted successfully"
@@ -112,16 +111,11 @@ class m_course:
     @classmethod
     def create_course(cls, code, name, college):
         try:
-            print(f"Inserting into database - Code: {code}, Name: {name}, College: {college}")
-
             cur = mysql.new_cursor(dictionary=True)
             cur.execute("INSERT INTO course (code, name, college) VALUES (%s, %s, %s)", (code, name, college))
-            mysql.connection.commit()
-            
-            print("Course created successfully")
+            mysql.connection.commit()            
             return "Course created successfully"
         except Exception as e:
-            print(f"Failed to create course: {str(e)}")
             return f"Failed to create course: {str(e)}"
 
     @classmethod
@@ -251,7 +245,7 @@ class m_student:
     @classmethod
     def search_students_by_gender(cls, search_query):
         cur = mysql.new_cursor(dictionary=True)
-        cur.execute("SELECT * FROM student WHERE gender LIKE %s", (f"%{search_query}%",))
+        cur.execute("SELECT * FROM student WHERE gender = %s", (f"%{search_query}%",))
         students = cur.fetchall()
         cur.close()
         return students
@@ -301,24 +295,15 @@ class m_student:
     @classmethod
     def upload_image(cls,image):
         try:
-            # Check if the file has an allowed extension
             allowed_extensions = {'png', 'jpg', 'jpeg'}
             if '.' in image.filename and image.filename.rsplit('.', 1)[1].lower() in allowed_extensions:
-                # Check if the file size is 1MB or less
                 max_file_size_mb = 1.0
-                max_file_size_bytes = max_file_size_mb * 1024 * 1024  # 1MB = 1024KB = 1024 * 1024 bytes
+                max_file_size_bytes = max_file_size_mb * 1024 * 1024  
 
                 if len(image.read()) <= max_file_size_bytes:
-                    # Reset the file pointer to the beginning for uploading
                     image.seek(0)
-
-                    # Generate a secure filename
                     filename = secure_filename(image.filename)
-
-                    # Upload the file to Cloudinary
-                    response = uploader.upload(image, folder=CLOUDINARY_FOLDER)  # Set the folder as needed
-
-                    # Return the Cloudinary URL of the uploaded image
+                    response = uploader.upload(image, folder=CLOUDINARY_FOLDER)  
                     return response['secure_url']
                 else:
                     flash("File size exceeds the maximum allowed limit (1MB).", "error")

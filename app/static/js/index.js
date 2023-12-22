@@ -2,7 +2,7 @@
 function confirmDeleteCollege(button) {
     var collegeCode = button.getAttribute('college-code');
     var csrfToken = button.getAttribute('csrf-token');
-    if (confirm("Are you sure you want to delete College " + collegeCode + " permanently?\nCourses and Students under this College will also be deleted.")) {
+    if (confirm("Are you sure you want to delete College " + collegeCode + " permanently?")) {
         fetch(`/college/delete_college/${collegeCode}`, {
             method: 'DELETE',
             headers: {
@@ -27,7 +27,7 @@ function confirmDeleteCollege(button) {
 function confirmDeleteCourse(button) {
     var course_code = button.getAttribute('course-code');
     var csrfToken = button.getAttribute('csrf-token');
-    if (confirm("Are you sure you want to delete Course " + course_code + " permanently?\nStudents under this course will also be deleted.")) {
+    if (confirm("Are you sure you want to delete Course " + course_code + " permanently?")) {
         fetch(`/delete_course/${course_code}`, {
             method: 'DELETE',
             headers: {
