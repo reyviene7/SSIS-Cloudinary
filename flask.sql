@@ -14,10 +14,10 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumping database structure for ccc151_cs1
-DROP DATABASE IF EXISTS `ccc151_cs1`;
-CREATE DATABASE IF NOT EXISTS `ccc151_cs1` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
-USE `ccc151_cs1`;
+-- Dumping database structure for ccc151_cs
+DROP DATABASE IF EXISTS `ccc151_cs`;
+CREATE DATABASE IF NOT EXISTS `ccc151_cs` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+USE `ccc151_cs`;
 
 -- Dumping structure for table ccc151_cs.users
 DROP TABLE IF EXISTS `users`;
@@ -74,5 +74,6 @@ CREATE TABLE IF NOT EXISTS Student (
                 course VARCHAR(80) NOT NULL,
                 year VARCHAR(10) NOT NULL,
                 gender VARCHAR(20) NOT NULL,
+                image_url VARCHAR(255) NOT NULL,
                 CONSTRAINT fk2 FOREIGN KEY (course) REFERENCES course (code) ON DELETE CASCADE ON UPDATE CASCADE
 );

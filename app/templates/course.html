@@ -10,12 +10,12 @@
             
             <div class="col-md-5 m-2 mx-auto text-center">
                 <form method="GET" action="{{ url_for('.search_course') }}" class="d-flex">
-                    <div class="input-group mb-3 me-3 w-75 p-0">
+                    <div class="input-group mb-3 me-3 w-80 p-0">
                         <label class="input-group-text" for="filter_by">Filter by</label>
                         <select class="form-select form-control-sm" id="filter_by" name="filter_by">
-                            <option value="code">Code</option>
-                            <option value="name">Name</option>
-                            <option value="college">College</option>
+                            <option value="code" {% if selected_filter == 'code' %}selected{% endif %}>Code</option>
+                            <option value="name" {% if selected_filter == 'name' %}selected{% endif %}>Name</option>
+                            <option value="college" {% if selected_filter == 'college' %}selected{% endif %}>College</option>
                         </select>
                     </div>
                     <div class="input-group mb-3">
@@ -81,8 +81,6 @@
         </div>
     </div>
 
-
-    <!-- Add Modal (Course) -->
     <div class="modal fade" id="Course_Add_Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -94,15 +92,15 @@
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <div class="form-group">
                             <label for="courseCode">Course Code</label>
-                            <input type="text" class="form-control" id="code" name="code" autocomplete="off" placeholder="Enter Course Code">
+                            <input type="text" class="form-control" id="code" name="code" autocomplete="off" placeholder="Enter Course Code" required>
                         </div>
                         <div class="form-group">
                             <label for "courseName">Name of Course</label>
-                            <input type="text" class="form-control" id="name" name="name" autocomplete="off" placeholder="Enter Name of Course">
+                            <input type="text" class="form-control" id="name" name="name" autocomplete="off" placeholder="Enter Name of Course" required>
                         </div>
                         <div class="form-group">
                             <label for="courseCollege">College</label>
-                            <select class="form-control" id="college" name="college">
+                            <select class="form-control" id="college" name="college" required>
                                 <option disabled selected>--Select College--</option>
                                 {% for college in colleges %}
                                     <option value="{{ college.name }}">{{ college.name }}</option>
@@ -119,7 +117,6 @@
         </div>  
     </div>
 
-    <!-- Update Modal (Course) -->
     {% for course in courses %}
     <div class="modal fade" id="UpdateCourseModal{{ course.code }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -157,7 +154,5 @@
         </div>
     </div>
     {% endfor %}
-
-    
 
 {% endblock %}

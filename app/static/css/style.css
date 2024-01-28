@@ -24,7 +24,7 @@ td .student-image {
 .header{
   min-height: 100vh;
   width: 100%;
-  background-image: linear-gradient(rgba(4,9,30,0.7),rgba(4,9,30,0.7)), url(banner.png);
+  background-image: linear-gradient(rgba(4,9,30,0.7),rgba(4,9,30,0.7)), url(https://res.cloudinary.com/dzwjjpvdb/image/upload/v1703204634/SSIS_CLOUDINARY/sptqncm4hzejicgozw8x.png);
   background-position: center;
   background-size: cover;
   position: relative;

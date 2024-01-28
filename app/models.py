@@ -1,5 +1,8 @@
 from app import mysql
 from flask import flash
+from cloudinary import uploader
+from config import CLOUDINARY_FOLDER
+from werkzeug.utils import secure_filename
 
 class Users(object):
 
@@ -52,7 +55,7 @@ class m_college(object):
     @classmethod
     def get_colleges(cls):
         cur = mysql.new_cursor(dictionary=True)
-        cur.execute("SELECT * FROM College")
+        cur.execute("SELECT * FROM college")
         colleges = cur.fetchall()
         cur.close()
         return colleges 
@@ -61,7 +64,7 @@ class m_college(object):
     def delete_college(cls, college_code):
         try:
             cur = mysql.new_cursor(dictionary=True)
-            cur.execute("DELETE FROM College WHERE code = %s", (college_code,))
+            cur.execute("DELETE FROM college WHERE code = %s", (college_code,))
             mysql.connection.commit()
             cur.close()
             return "College deleted successfully"
@@ -82,7 +85,7 @@ class m_college(object):
     @classmethod
     def get_college_by_code(cls, code):
         cur = mysql.new_cursor(dictionary=True)
-        cur.execute("SELECT * FROM College WHERE code = %s", (code,))
+        cur.execute("SELECT * FROM college WHERE code = %s", (code,))
         college = cur.fetchone()
         cur.close()
         return college
@@ -90,7 +93,7 @@ class m_college(object):
     @classmethod
     def search_colleges_by_code(cls, search_query):
         cur = mysql.new_cursor(dictionary=True)
-        cur.execute("SELECT * FROM College WHERE code LIKE %s", (f"%{search_query}%",))
+        cur.execute("SELECT * FROM college WHERE code LIKE %s", (f"%{search_query}%",))
         colleges = cur.fetchall()
         cur.close()
         return colleges
@@ -98,7 +101,7 @@ class m_college(object):
     @classmethod
     def search_colleges_by_name(cls, search_query):
         cur = mysql.new_cursor(dictionary=True)
-        cur.execute("SELECT * FROM College WHERE name LIKE %s", (f"%{search_query}%",))
+        cur.execute("SELECT * FROM college WHERE name LIKE %s", (f"%{search_query}%",))
         colleges = cur.fetchall()
         cur.close()
         return colleges
@@ -106,13 +109,12 @@ class m_college(object):
 
 class m_course:
     @classmethod
-    def create_course(cls, code, name, College):
+    def create_course(cls, code, name, college):
         try:
             cur = mysql.new_cursor(dictionary=True)
-            cur.execute("INSERT INTO course (code, name, College) VALUES (%s, %s, %s)", (code, name, College))
-            mysql.connection.commit()
+            cur.execute("INSERT INTO course (code, name, college) VALUES (%s, %s, %s)", (code, name, college))
+            mysql.connection.commit()            
             return "Course created successfully"
-        
         except Exception as e:
             return f"Failed to create course: {str(e)}"
 
@@ -138,7 +140,7 @@ class m_course:
     def update_course(cls, course_code, new_code, new_name, new_college):
         try:
             cur = mysql.new_cursor(dictionary=True)
-            cur.execute("UPDATE course SET code = %s, name = %s, College = %s WHERE code = %s", (new_code, new_name, new_college, course_code))
+            cur.execute("UPDATE course SET code = %s, name = %s, college = %s WHERE code = %s", (new_code, new_name, new_college, course_code))
             mysql.connection.commit()
             cur.close()
             return "Course updated successfully"
@@ -164,14 +166,14 @@ class m_course:
     @classmethod
     def search_courses_by_college(cls, search_query):
         cur = mysql.new_cursor(dictionary=True)
-        cur.execute("SELECT * FROM course WHERE College LIKE %s", (f"%{search_query}%",))
+        cur.execute("SELECT * FROM course WHERE college LIKE %s", (f"%{search_query}%",))
         courses = cur.fetchall()
         cur.close()
         return courses
 
 class m_student:
     @classmethod
-    def add_student(cls, id, firstname, lastname, course_code, year, gender):
+    def add_student(cls, id, firstname, lastname, course_code, year, gender, image_url):
         try:
             cur = mysql.new_cursor(dictionary=True)
 
@@ -183,8 +185,8 @@ class m_student:
                 return "Failed to create student"
 
             # Insert the new student record
-            cur.execute("INSERT INTO student (id, firstname, lastname, course, year, gender) VALUES ( %s, %s, %s, %s, %s, %s)",
-                        (id, firstname, lastname, course_code, year, gender))
+            cur.execute("INSERT INTO student (id, firstname, lastname, course, year, gender, image_url) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+                        (id, firstname, lastname, course_code, year, gender, image_url))
             mysql.connection.commit()
             
             return "Student created successfully"
@@ -249,7 +251,7 @@ class m_student:
         return students
     
     @classmethod
-    def update_student(cls, student_id, new_id, new_firstname, new_lastname, new_course, new_year, new_gender):
+    def update_student(cls, student_id, new_id, new_firstname, new_lastname, new_course, new_year, new_gender, new_image_url):
         try:
             cur = mysql.new_cursor(dictionary=True)
             cur.execute("SELECT id FROM student WHERE id = %s AND id != %s", (new_id, student_id))
@@ -257,8 +259,8 @@ class m_student:
             if existing_id:
                 flash("ID is already taken.", "error")
                 return "Failed to update student"
-            cur.execute("UPDATE student SET id=%s, firstname=%s, lastname=%s, course=%s, year=%s, gender=%s WHERE id=%s",
-                        (new_id, new_firstname, new_lastname, new_course, new_year, new_gender, student_id))
+            cur.execute("UPDATE student SET id=%s, firstname=%s, lastname=%s, course=%s, year=%s, gender=%s, image_url=%s WHERE id=%s",
+                        (new_id, new_firstname, new_lastname, new_course, new_year, new_gender, new_image_url, student_id))
 
             mysql.connection.commit()
             cur.close()
@@ -288,4 +290,28 @@ class m_student:
             return {"success": True, "message": "Course deleted successfully"}
         except Exception as e:
             return {"success": False, "message": str(e)}
-    
+        
+        
+    @classmethod
+    def upload_image(cls,image):
+        try:
+            allowed_extensions = {'png', 'jpg', 'jpeg'}
+            if '.' in image.filename and image.filename.rsplit('.', 1)[1].lower() in allowed_extensions:
+                max_file_size_mb = 1.0
+                max_file_size_bytes = max_file_size_mb * 1024 * 1024  
+
+                if len(image.read()) <= max_file_size_bytes:
+                    image.seek(0)
+                    filename = secure_filename(image.filename)
+                    response = uploader.upload(image, folder=CLOUDINARY_FOLDER)  
+                    return response['secure_url']
+                else:
+                    flash("File size exceeds the maximum allowed limit (1MB).", "error")
+                    return None
+            else:
+                flash("Invalid file type. Please upload a valid image file (allowed types: png, jpg, jpeg).", "error")
+                return None
+
+        except Exception as e:
+            flash("Failed to upload image. Please try again.", "error")
+            return None

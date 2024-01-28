@@ -19,8 +19,8 @@
                     <div class="input-group mb-3 me-3 w-75 p-0">
                         <label class="input-group-text" for="filter_by">Filter by</label>
                         <select class="form-select form-control-sm" id="filter_by" name="filter_by">
-                            <option value="code">Code</option>
-                            <option value="name">Name</option>
+                            <option value="code" {% if selected_filter == 'code' %}selected{% endif %}>Code</option>
+                            <option value="name" {% if selected_filter == 'name' %}selected{% endif %}>Name</option>
                         </select>
                     </div>
                     <div class="input-group mb-3">
@@ -84,8 +84,6 @@
         </div>
     </div>
 
-
-    <!-- Add Modal (College) -->
     <div class="modal fade" id="College_Add_Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -113,7 +111,6 @@
         </div>  
     </div>
 
-    <!-- Update Modal (College) -->
     {% for college in colleges %}
     <div class="modal fade" id="C_Update_Modal{{ college.code }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
