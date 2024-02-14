@@ -1,16 +1,87 @@
-from flask import render_template, redirect, request, jsonify, url_for, flash
+from flask import render_template, redirect, request, jsonify, url_for, flash, session
 from . import user_bp
 import app.models as models
-from app.models import m_college, m_course, m_student
+from app.models import m_college, m_course, m_student, Users
 from app.user.forms import UserForm
-
+import bcrypt
+from app import login_manager
+from app import mysql
+from flask_login import UserMixin, LoginManager, login_user, login_required, logout_user, current_user
+import re
 
 @user_bp.route('/')
 def index():
     return render_template('index.html', title='Home')
 
+@login_manager.user_loader
+def load_user(user_id):
+    return Users.get(user_id)
+
+@user_bp.route('/login_page', methods=['GET', 'POST'])
+def login_page():
+    msg=''
+    cursor = mysql.connection.cursor()
+    if current_user.is_authenticated:
+        return redirect(url_for('user.college_db'))
+
+    form = UserForm(request.form)
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        cursor.execute('SELECT * FROM users WHERE username=%s AND password=%s',(username,password))
+        record = cursor.fetchone()
+        if record:
+            session['loggedin']= True
+            session['username']= record[1]
+            return redirect(url_for('user.college_db'))
+        else:
+            flash('Incorrect username or password. Try it again!', 'error')
+
+    return render_template('login_page.html', title='Login', form=form, msg=msg)
+
+@user_bp.route('/logout')
+def logout():
+    session.pop('loggedin', None)
+    session.pop('username', None)
+    return redirect(url_for('user.login_page'))
+
+@user_bp.route('/signup', methods=['GET','POST'])
+def signup():
+    msg=''
+    cursor = mysql.connection.cursor()
+    form = UserForm(request.form)
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        email = request.form.get('email')
+        cursor.execute('SELECT * FROM users WHERE email=%s',(email,))
+        record = cursor.fetchone()
+        
+        if record:
+            msg = 'Account already exists !'
+        elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
+            msg = 'Invalid email address !'
+        elif not username or not password or not email:
+            msg = 'Please fill out the form !'
+        else:
+            cursor.execute('INSERT INTO users (username, email, password) VALUES (%s, %s, %s)', (username, email, password))
+            mysql.connection.commit()
+            msg = 'You have successfully registered !'
+            return redirect(url_for('user.login_page'))
+
+    elif request.method == 'POST':
+        msg = 'Please fill out the form !'
+
+    account = Users.get_users()
+    
+    return render_template('login_page.html', title='Sign Up', form=form, account=account, msg=msg)
+
 @user_bp.route('/college', methods=['GET', 'POST'])
 def college_db():
+    try:
+        username = session['username']
+    except KeyError:
+        return redirect(url_for('user.login_page'))
     if request.method == 'POST':
         code = request.form.get('code')
         name = request.form.get('name')
@@ -25,7 +96,7 @@ def college_db():
 
     colleges = m_college.get_colleges()     
     print(colleges)
-    return render_template('college.html', colleges=colleges, title='College',something='something')
+    return render_template('college.html', username=username, colleges=colleges, title='College',something='something')
 
 @user_bp.route('/college/delete_college/<string:college_code>', methods=['DELETE'])
 def delete_college(college_code):
@@ -44,25 +115,7 @@ def update_college(college_code):
         return redirect(url_for('user.college_db'))
     college = m_college.get_college_by_code(college_code)
     return render_template('college.html', college=college)
-     
-@user_bp.route('/user/register', methods=['POST','GET'])
-def register():
-    form = UserForm(request.form)
-    if request.method == 'POST' and form.validate():
-        user = models.m_college(code=form.code.data, name=form.name.data)
-        user.add()
-        return redirect('/user')
-    else:
-        return render_template('signup.html', form=form)
 
-@user_bp.route("/user/delete", methods=["POST"])
-def delete():
-    id = request.form['id']
-    if models.Users.delete(id):
-        return jsonify(success=True,message="Successfully deleted")
-    else:
-        return jsonify(success=False,message="Failed")          
-    
 @user_bp.route('/search_college', methods=['GET'])
 def search_college():
     search_query = request.args.get('search')
@@ -78,6 +131,10 @@ def search_college():
 @user_bp.route('/course', methods=['GET' , 'POST'])
 def course():
     colleges = m_college.get_colleges()
+    try:
+        username = session['username']
+    except KeyError:
+        return redirect(url_for('user.login_page'))
     if request.method == 'POST':
         code = request.form.get('code')
         name = request.form.get('name')
@@ -93,7 +150,7 @@ def course():
 
     courses = m_course.get_courses()
     print(courses)
-    return render_template('course.html', courses=courses, title="Course", colleges=colleges)
+    return render_template('course.html', courses=courses , username=username, title="Course", colleges=colleges)
 
 @user_bp.route('/delete_course/<string:course_code>', methods=['DELETE'])
 def delete_course(course_code):
@@ -135,6 +192,11 @@ def search_course():
 @user_bp.route('/student', methods=['GET', 'POST'])
 def student():
     courses = m_course.get_courses()
+    
+    try:
+        username = session['username']
+    except KeyError:
+        return redirect(url_for('user.login_page'))
 
     if request.method == 'POST':
         id = request.form.get('id')
@@ -168,7 +230,7 @@ def student():
 
     students = m_student.get_students()
     print(students)
-    return render_template('student.html', students=students, title="Student", courses=courses)
+    return render_template('student.html', students=students, username=username, title="Student", courses=courses)
 
 @user_bp.route('/delete_student/<string:student_id>', methods=['DELETE'])
 def delete_student(student_id):

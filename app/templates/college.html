@@ -4,7 +4,6 @@
    utils module here to automatically render Flask's flashed messages in a
    bootstrap friendly manner #}
 {% import "bootstrap/utils.html" as utils %}
-{% block title %} Simple Student Information System {% endblock %}
 {% include 'navbar.html' %}
 
 {% block content %}
@@ -26,14 +25,14 @@
                     <div class="input-group mb-3">
                         <input class="form-control me-2" type="text" name="search" autocomplete="off" placeholder="Search" aria-label="Search">
                         <div class="input-group-append">
-                            <button class="btn btn-primary" type="submit">Search</button>
+                            <button class="btn custom-btn" type="submit">Search</button>
                         </div>
                     </div>
                 </form>
             </div>
         <div class="row mb-4">
             <div class="col text-center">
-                <span class="float-right btn btn-primary" data-bs-toggle="modal" data-bs-target="#College_Add_Modal" id="addBtn">Add College </a></span>
+                <span class="float-right btn custom-btn" data-bs-toggle="modal" data-bs-target="#College_Add_Modal" id="addBtn">Add College </a></span>
             </div>
         </div>
         
@@ -102,7 +101,7 @@
                             <input type="text" class="form-control" id="name" name="name" autocomplete="off" placeholder="Enter Name of College">
                         </div>
                         <div class="modal-footer">
-                            <button type="submit" form="college_form" class="btn btn-primary">Add</button>
+                            <button type="submit" form="college_form" class="btn custom-btn">Add</button>
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         </div>
                     </form>
@@ -130,7 +129,7 @@
                             <input type="text" class="form-control" name="name" value="{{ college.name }}" autocomplete="off" placeholder="e.g College of Computer Studies">
                         </div>
                         <div class="modal-footer">
-                            <button type="submit" form="edit_college_form" class="btn btn-primary">Update</button>
+                            <button type="submit" form="edit_college_form" class="btn custom-btn">Update</button>
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         </div>
                     </form>

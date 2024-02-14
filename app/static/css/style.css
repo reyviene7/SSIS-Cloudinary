@@ -93,3 +93,14 @@ nav img{
   position: relative;
   cursor: pointer;
 }
+
+.custom-btn {
+  background-color: #512da8;
+  color: #fff;
+}
+
+.custom-btn:hover {
+  background-color: #3c1f78; /* Adjust the hover color as needed */
+  border-color: #3c1f78; /* Adjust the hover color as needed */
+  color: white;
+}

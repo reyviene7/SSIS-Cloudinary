@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `id` int NOT NULL AUTO_INCREMENT,
   `username` varchar(20) DEFAULT NULL,
   `email` varchar(50) DEFAULT NULL,
-  `user_password` varchar(50) DEFAULT NULL,
+  `password` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`)
 ) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS `user_info` (
 CREATE TABLE IF NOT EXISTS College (
                 code VARCHAR(5) NOT NULL PRIMARY KEY,
                 name VARCHAR(50) NOT NULL
-)
+);
 
 CREATE INDEX College ON College (name);
 
@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS Course (
                 name VARCHAR(80) NOT NULL,
                 College VARCHAR(50) NOT NULL,
                 CONSTRAINT fk1 FOREIGN KEY (College) REFERENCES College (name) ON DELETE CASCADE ON UPDATE CASCADE
-)
+);
 
 CREATE TABLE IF NOT EXISTS Student (
                 id VARCHAR(20) NOT NULL PRIMARY KEY,

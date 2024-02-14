@@ -3,9 +3,12 @@ from flask_mysql_connector import MySQL
 from flask_bootstrap import Bootstrap
 from config import DB_USERNAME, DB_PASSWORD, DB_NAME, DB_HOST, SECRET_KEY
 from flask_wtf.csrf import CSRFProtect
+from flask_login import UserMixin, LoginManager, login_user, login_required, logout_user, current_user
 
 mysql = MySQL()
 bootstrap = Bootstrap()
+login_manager = LoginManager()
+login_manager.login_view = 'user.login_page'
 
 def create_app(test_config=None):
     app = Flask(__name__)
@@ -18,6 +21,7 @@ def create_app(test_config=None):
     bootstrap.init_app(app)
     mysql.init_app(app)
     CSRFProtect(app)
+    login_manager.init_app(app)
 
     from .user import user_bp as user_blueprint
     from .user import course_bp as course_blueprint
