@@ -43,7 +43,7 @@ def login_page():
 def logout():
     session.pop('loggedin', None)
     session.pop('username', None)
-    return redirect(url_for('user.login_page'))
+    return redirect(url_for('user.index'))
 
 @user_bp.route('/signup', methods=['GET','POST'])
 def signup():

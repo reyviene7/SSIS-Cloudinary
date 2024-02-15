@@ -252,46 +252,46 @@
                 var modal = button.closest('.modal');
                 var currentPage = parseInt(modal.getAttribute('data-page')) || 1; 
                 var nextPage = currentPage + increment;
-    
+        
                 showPage(modal, nextPage);
                 modal.setAttribute('data-page', nextPage);
             }
-    
+        
             function resetModal(modal) {
-                var nextButtons = modal.querySelectorAll('.modal-footer .btn-primary');
+                var nextButtons = modal.querySelectorAll('.modal-footer .custom-btn');
                 nextButtons.forEach(function (button) {
                     button.setAttribute('data-page', '1');
                 });
-    
+        
                 showPage(modal, 1);
             }
-    
+        
             function showPage(modal, pageNumber) {
                 var pages = modal.getElementsByClassName('page');
-    
+        
                 for (var i = 0; i < pages.length; i++) {
                     pages[i].style.display = 'none';
                 }
-    
+        
                 pages[pageNumber - 1].style.display = 'block';
             }
-    
+        
             showPage(document.getElementById('Student_Add_Modal'), 1);
-    
+        
             var updateModals = document.querySelectorAll('[id^="UpdateStudentModal"]');
             updateModals.forEach(function (modal) {
                 modal.addEventListener('show.bs.modal', function () {
                     resetModal(modal);
                 });
             });
-    
-            var nextButtons = document.querySelectorAll('.modal-footer .btn-primary');
+        
+            var nextButtons = document.querySelectorAll('.modal-footer .custom-btn');
             nextButtons.forEach(function (button) {
                 button.addEventListener('click', function () {
                     handlePageNavigation(button, 1);
                 });
             });
-    
+        
             var prevButtons = document.querySelectorAll('.modal-footer .btn-secondary');
             prevButtons.forEach(function (button) {
                 button.addEventListener('click', function () {
@@ -299,6 +299,7 @@
                 });
             });
         });
+        
     </script>
 
 
