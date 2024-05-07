@@ -1,0 +1,158 @@
+{% extends "layout.html" %}
+{% include 'navbar.html' %}
+
+{% block content %}
+    <div class="container">
+        <div class="col">
+            <div class="col m-4 text-center">
+                <h1>Course</h1>
+            </div>
+            
+            <div class="col-md-5 m-2 mx-auto text-center">
+                <form method="GET" action="{{ url_for('.search_course') }}" class="d-flex">
+                    <div class="input-group mb-3 me-3 w-80 p-0">
+                        <label class="input-group-text" for="filter_by">Filter by</label>
+                        <select class="form-select form-control-sm" id="filter_by" name="filter_by">
+                            <option value="code" {% if selected_filter == 'code' %}selected{% endif %}>Code</option>
+                            <option value="name" {% if selected_filter == 'name' %}selected{% endif %}>Name</option>
+                            <option value="college" {% if selected_filter == 'college' %}selected{% endif %}>College</option>
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                        <input class="form-control me-2" type="text" name="search" autocomplete="off" placeholder="Search" aria-label="Search">
+                        <div class="input-group-append">
+                            <button class="btn custom-btn" type="submit">Search</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        <div class="row mb-4">
+            <div class="col text-center">
+                <span class="float-right btn custom-btn" data-bs-toggle="modal" data-bs-target="#Course_Add_Modal" id="addBtn">Add Course </a></span>
+            </div>
+        </div>
+        
+
+        {% with messages = get_flashed_messages() %}
+        
+        {% if messages%}
+        
+        {% for message in messages%}
+        <div class="alert alert-success alert-dismissable d-flex justify-content-between" role="alert">
+            {{ message }}
+
+            <button type="button" class="btn btn-transparent pull-right close" data-dismiss="alert" aria-label="close">
+
+                <span aria-hidden="true">&times;</span>
+                
+            </button>
+
+        </div>
+        {% endfor %}
+
+        {% endif%}
+
+        {% endwith %}
+
+        <div class="row mt-2 text-center">
+            <table class="table table-light text-center">
+                <thead>
+                <tr class="table-primary">
+                    <th>Code</th>
+                    <th>Name of Course</th>
+                    <th>College</th>
+	                <th>Option</th>
+                </tr>
+	            </thead>
+	            <tbody>
+		        {% for course in courses %}
+		            <tr>
+			            <td>{{ course.code }}</td>
+			            <td>{{ course.name }}</td>
+			            <td>{{ course.College }}</td>
+                        <td>
+                            <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#UpdateCourseModal{{ course.code }}">Edit</button> 
+                            <button class="btn btn-danger btn-delete" onclick="confirmDeleteCourse(this)" course-code="{{ course.code }}" csrf-token="{{ csrf_token() }}">Delete</button>
+                        </td>
+		            </tr>
+		        {% endfor %}
+	            </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="modal fade" id="Course_Add_Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add Course</h5>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="{{ url_for('.course') }}" id="course_form">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="form-group">
+                            <label for="courseCode">Course Code</label>
+                            <input type="text" class="form-control" id="code" name="code" autocomplete="off" placeholder="Enter Course Code" required>
+                        </div>
+                        <div class="form-group">
+                            <label for "courseName">Name of Course</label>
+                            <input type="text" class="form-control" id="name" name="name" autocomplete="off" placeholder="Enter Name of Course" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="courseCollege">College</label>
+                            <select class="form-control" id="college" name="college" required>
+                                <option disabled selected>--Select College--</option>
+                                {% for college in colleges %}
+                                    <option value="{{ college.name }}">{{ college.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" form="course_form" class="btn custom-btn">Add</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>  
+    </div>
+
+    {% for course in courses %}
+    <div class="modal fade" id="UpdateCourseModal{{ course.code }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="UpdateCourseModalLabel{{ course.code }}">Edit Course</h5>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="{{ url_for('.update_course', course_code=course.code) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="form-group">
+                            <label for="update_code">Course Code</label>
+                            <input type="text" class="form-control" id="update_code" name="code" value="{{ course.code }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="update_name">Course Name</label>
+                            <input type="text" class="form-control" id="update_name" name="name" value="{{ course.name }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="update_college">College</label>
+                            <select class="form-control" id="update_college" name="college">
+                                <option disabled selected>--Select College--</option>
+                                {% for college in colleges %}
+                                    <option value="{{ college.name }}" {% if college.name == course.college %}selected{% endif %}>{{ college.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn custom-btn">Update</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+{% endblock %}

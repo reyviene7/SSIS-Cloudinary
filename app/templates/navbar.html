@@ -1,0 +1,20 @@
+<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #512da8; border-bottom: 1px solid #512da8;">
+    <div class="container-fluid">
+        <a href="{{ url_for('.index') }}">
+            <img src="https://res.cloudinary.com/dzwjjpvdb/image/upload/v1703204632/SSIS_CLOUDINARY/ayt1bemgeyymsjvnpv5s.png">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+                <a class="nav-link mr-5" aria-current="page" href="{{ url_for('.index') }}" style="color: white;">HOME</a>
+                <a class="nav-link mr-5" href="{{ url_for('.college_db') }}" style="color: white;">COLLEGE</a>
+                <a class="nav-link mr-5" href="{{ url_for('user.course') }}" style="color: white;">COURSE</a>
+                <a class="nav-link mr-5" href="{{ url_for('.student') }}" style="color: white;">STUDENT</a>
+                <a class="nav-link" href="{{ url_for('user.logout') }}" style="color: white;">LOGOUT</a>
+            </div>
+        </div>
+    </div>
+</nav>
+

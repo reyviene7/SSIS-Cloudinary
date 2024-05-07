@@ -1,0 +1,143 @@
+{% extends "layout.html" %}
+
+{# Loads some of the macros included with Flask-Bootstrap. We are using the
+   utils module here to automatically render Flask's flashed messages in a
+   bootstrap friendly manner #}
+{% import "bootstrap/utils.html" as utils %}
+{% include 'navbar.html' %}
+
+{% block content %}
+    <div class="container">
+        <div class="col">
+            <div class="col m-4 text-center">
+                <h1>College</h1>
+            </div>
+            
+            <div class="col-md-5 m-2 mx-auto text-center">
+                <form method="GET" action="{{ url_for('.search_college') }}" class="d-flex">
+                    <div class="input-group mb-3 me-3 w-75 p-0">
+                        <label class="input-group-text" for="filter_by">Filter by</label>
+                        <select class="form-select form-control-sm" id="filter_by" name="filter_by">
+                            <option value="code" {% if selected_filter == 'code' %}selected{% endif %}>Code</option>
+                            <option value="name" {% if selected_filter == 'name' %}selected{% endif %}>Name</option>
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                        <input class="form-control me-2" type="text" name="search" autocomplete="off" placeholder="Search" aria-label="Search">
+                        <div class="input-group-append">
+                            <button class="btn custom-btn" type="submit">Search</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        <div class="row mb-4">
+            <div class="col text-center">
+                <span class="float-right btn custom-btn" data-bs-toggle="modal" data-bs-target="#College_Add_Modal" id="addBtn">Add College </a></span>
+            </div>
+        </div>
+        
+
+        {% with messages = get_flashed_messages() %}
+        
+        {% if messages%}
+        
+        {% for message in messages%}
+        <div class="alert alert-success alert-dismissable d-flex justify-content-between" role="alert">
+            {{ message }}
+
+            <button type="button" class="btn btn-transparent close" data-dismiss="alert" aria-label="close">
+
+                <span aria-hidden="true">&times;</span>
+                
+            </button>
+
+        </div>
+        {% endfor %}
+
+        {% endif%}
+
+        {% endwith %}
+
+        <div class="row mt-2 text-center">
+            <table class="table table-light text-center">
+                <thead>
+                <tr class="table-primary">
+                    <th>Code</th>
+                    <th>Name of College</th>
+	                <th>Option</th>
+                </tr>
+	            </thead>
+	            <tbody>
+		        {% for college in colleges %}
+		            <tr>
+			            <td>{{ college.code }}</td>
+			            <td>{{ college.name }}</td>
+                        <td>
+                            <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#C_Update_Modal{{ college.code }}">Edit</button> 
+                            <button class="btn btn-danger btn-delete" onclick="confirmDeleteCollege(this)" college-code="{{ college.code }}" csrf-token="{{ csrf_token() }}">Delete</button>
+                        </td>
+		            </tr>
+		        {% endfor %}
+	            </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="modal fade" id="College_Add_Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add College</h5>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="{{ url_for('.college_db') }}" id="college_form">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="form-group">
+                            <label for="collegeCode">College Code</label>
+                            <input type="text" class="form-control" id="code" name="code" autocomplete="off" placeholder="Enter College Code">
+                        </div>
+                        <div class="form-group">
+                            <label for "collegeName">Name of College</label>
+                            <input type="text" class="form-control" id="name" name="name" autocomplete="off" placeholder="Enter Name of College">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" form="college_form" class="btn custom-btn">Add</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>  
+    </div>
+
+    {% for college in colleges %}
+    <div class="modal fade" id="C_Update_Modal{{ college.code }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Edit College</h5>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="{{ url_for('user.update_college', college_code=college.code) }}" id="edit_college_form">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="form-group">
+                            <label for="collegeCode">College Code</label>
+                            <input type="text" class="form-control" name="code" value="{{ college.code }}" autocomplete="off" placeholder="e.g CCS">
+                        </div>
+                        <div class="form-group">
+                            <label for "collegeName">College Name</label>
+                            <input type="text" class="form-control" name="name" value="{{ college.name }}" autocomplete="off" placeholder="e.g College of Computer Studies">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" form="edit_college_form" class="btn custom-btn">Update</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+
+{% endblock %}

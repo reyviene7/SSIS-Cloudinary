@@ -1,0 +1,306 @@
+{% extends "layout.html" %}
+{% include 'navbar.html' %}
+
+{% block content %}
+    <div class="container">
+        <div class="col text-center">
+            <div class="col m-4">
+                <h1>Student</h1>
+            </div>
+            
+            <div class="col-md-5 m-2 mx-auto text-center">
+                <form method="GET" action="{{ url_for('.search_student') }}" class="d-flex">
+                    <div class="input-group mb-3 me-3 w-80 p-0">
+                        <label class="input-group-text" for="filter_by">Filter by</label>
+                        <select class="form-select form-control-sm" id="filter_by" name="filter_by">
+                            <option value="id" {% if selected_filter == 'id' %}selected{% endif %}>ID</option>
+                            <option value="firstname" {% if selected_filter == 'firstname' %}selected{% endif %}>First Name</option>
+                            <option value="lastname" {% if selected_filter == 'lastname' %}selected{% endif %}>Last Name</option>
+                            <option value="course" {% if selected_filter == 'course' %}selected{% endif %}>Course</option>
+                            <option value="year" {% if selected_filter == 'year' %}selected{% endif %}>Year</option>
+                            <option value="gender" {% if selected_filter == 'gender' %}selected{% endif %}>Gender</option>
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                        <input class="form-control me-2" type="text" name="search" autocomplete="off" placeholder="Search" aria-label="Search">
+                        <div class="input-group-append">
+                            <button class="btn custom-btn" type="submit">Search</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        <div class="row mb-4">
+            <div class="col text-center">
+                <span class="btn custom-btn float-right" data-bs-toggle="modal" data-bs-target="#Student_Add_Modal" id="addBtn">Add Student</span>
+            </div>
+        </div>
+
+        {% with messages = get_flashed_messages() %}
+        
+        {% if messages%}
+        
+        {% for message in messages%}
+        <div class="alert alert-success alert-dismissable d-flex justify-content-between" role="alert">
+            {{ message }}
+
+            <button type="button" class="btn btn-transparent pull-right close" data-dismiss="alert" aria-label="close">
+
+                <span aria-hidden="true">&times;</span>
+                
+            </button>
+
+        </div>
+        {% endfor %}
+
+        {% endif%}
+
+        {% endwith %}
+
+        <div class="row mt-2">
+            <table class="table table-light text-center">
+                <thead>
+                <tr class="table-primary">
+                    <th></th>
+                    <th>ID</th>
+                    <th>Firstname</th>
+                    <th>Lastname</th>
+	                <th>Course</th>
+	                <th>Year</th>
+	                <th>Gender</th>
+	                <th>Option</th>
+                </tr>
+	            </thead>
+	            <tbody>
+		        {% for student in students %}
+		            <tr>
+                        <td><img src="{{ student.image_url }}" alt="Student Image" class="student-image" width="50px">
+                        </td>
+			            <td>{{student.id }}</td>
+                        <td>{{student.firstname }}</td>
+                        <td>{{student.lastname }}</td>
+                        <td>{{student.course }}</td>
+                        <td>{{student.year }}</td>
+                        <td>{{student.gender }}</td>
+                        <td>
+                            <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#UpdateStudentModal{{ student.id }}">Edit</button> 
+                            <button class="btn btn-danger btn-delete" onclick="confirmDeleteStudent(this)" student-id="{{ student.id }}" csrf-token="{{ csrf_token() }}">Delete</button>
+                        </td>
+		            </tr>
+		        {% endfor %}
+	            </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="modal fade" id="Student_Add_Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add Student</h5>
+                </div>
+                <div class="modal-body">
+
+                    <div class="pagination-container">
+                        <form method="POST" action="{{ url_for('.student') }}" id="student_form" enctype="multipart/form-data">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    
+                            <div class="page" id="page1">
+                                <div class="form-group mb-3">
+                                    <label for="id">Student ID</label>
+                                    <input type="text" class="form-control" id="id" name="id" autocomplete="off" placeholder="2020-0001" pattern="20\d{2}-\d{4}" required>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label for="firstName">First Name</label>
+                                    <input type="text" class="form-control" id="firstName" name="firstname" autocomplete="off" placeholder="Rey Viene Dean" required>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label for="lastName">Last Name</label>
+                                    <input type="text" class="form-control" id="lastName" name="lastname" autocomplete="off" placeholder="Pasiculan" required>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label for="course">Course</label>
+                                    <select class="form-select" id="course" name="course" required>
+                                        <option disabled selected value="">--Select Course--</option>
+                                        {% for course in courses %}
+                                            <option value="{{ course.code }}">{{ course.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label for="year">Year</label>
+                                    <select class="form-select" id="year" name="year" required>
+                                        <option disabled selected value="">--Select Year--</option>
+                                        <option value="1st year">1st year</option>
+                                        <option value="2nd year">2nd year</option>
+                                        <option value="3rd year">3rd year</option>
+                                        <option value="4th year">4th year</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label for="gender">Gender</label>
+                                    <select class="form-select" id="gender" name="gender" required>
+                                        <option disabled selected value="">--Select Gender--</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                        <option value="Other">Other</option>   
+                                    </select>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn custom-btn" onclick="showPage(2)">Next</button>
+                                </div>
+                            </div>
+                            <div class="page" id="page2" style="display: none;">
+                                <div class="mb-3 text-center">
+                                    <label for="image">Image</label>
+                                </div>
+                                <div class="mb-3 d-flex justify-content-center align-items-center flex-column">
+                                    <img src="https://res.cloudinary.com/dzwjjpvdb/image/upload/v1702977617/SSIS_CLOUDINARY/user_profile_fcfymn.jpg" alt="Student Image" class="img-thumbnail mb-3" width="100px">
+                                    <input type="file" class="form-control" id="image" name="image">
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" class="btn custom-btn">Add</button>
+                                    <button type="button" class="btn btn-secondary" onclick="showPage(1)">Previous</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% for student in students %}
+    <div class="modal fade" id="UpdateStudentModal{{ student.id }}" tabindex="-1" role="dialog" aria-labelledby="UpdateStudentModalLabel{{ student.id }}" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="UpdateStudentModalLabel{{ student.id }}">Edit Student</h5>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="{{ url_for('.update_student', student_id=student.id) }}" enctype="multipart/form-data">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="page" id="page1">
+                        <div class="form-group">
+                            <label for="update_id">Student ID</label>
+                            <input type="text" class="form-control" id="update_id" name="id" value="{{ student.id }}" pattern="20\d{2}-\d{4}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="update_firstname">First Name</label>
+                            <input type="text" class="form-control" id="update_firstname" name="firstname" value="{{ student.firstname }}" required>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="update_lastname">Last Name</label>
+                            <input type="text" class="form-control" id="update_lastname" name="lastname" value="{{ student.lastname }}" required>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="update_course">Course</label>
+                            <select class="form-select" id="update_course" name="course" required>
+                                <option disabled selected value="">--Select Course--</option>
+                                {% for course in courses %}
+                                    <option value="{{ course.code }}" {% if course.code == student.course %}selected{% endif %}>{{ course.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="update_year">Year</label>
+                            <select class="form-select" id="update_year" name="year" required>
+                                <option disabled selected value="">--Select Year--</option>
+                                <option value="1st year" {% if student.year == "1st year" %}selected{% endif %}>1st year</option>
+                                <option value="2nd year" {% if student.year == "2nd year" %}selected{% endif %}>2nd year</option>
+                                <option value="3rd year" {% if student.year == "3rd year" %}selected{% endif %}>3rd year</option>
+                                <option value="4th year" {% if student.year == "4th year" %}selected{% endif %}>4th year</option>
+                                <option value="Other" {% if student.year == "Other" %}selected{% endif %}>Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="update_gender">Gender</label>
+                            <select class="form-select" id="update_gender" name="gender" required>
+                                <option disabled selected value="">--Select Gender--</option>
+                                <option value="Male" {% if student.gender == "Male" %}selected{% endif %}>Male</option>
+                                <option value="Female" {% if student.gender == "Female" %}selected{% endif %}>Female</option>
+                                <option value="Other" {% if student.gender == "Other" %}selected{% endif %}>Other</option>
+                            </select>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn custom-btn" onclick="showPage(2)">Next</button>
+                        </div>
+                    </div>
+                    <div class="page" id="page2" style="display: none;">
+                        <div class="mb-3 text-center">
+                            <label for="update_image">Image</label>
+                        </div>
+                        <div class="mb-3 d-flex justify-content-center align-items-center flex-column">
+                            <img src="{{ student.image_url }}" alt="Student Image" class="img-thumbnail mb-3" width="100px">
+                            <input type="file" class="form-control" id="update_image" name="image">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn custom-btn">Update</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            function handlePageNavigation(button, increment) {
+                var modal = button.closest('.modal');
+                var currentPage = parseInt(modal.getAttribute('data-page')) || 1; 
+                var nextPage = currentPage + increment;
+        
+                showPage(modal, nextPage);
+                modal.setAttribute('data-page', nextPage);
+            }
+        
+            function resetModal(modal) {
+                var nextButtons = modal.querySelectorAll('.modal-footer .custom-btn');
+                nextButtons.forEach(function (button) {
+                    button.setAttribute('data-page', '1');
+                });
+        
+                showPage(modal, 1);
+            }
+        
+            function showPage(modal, pageNumber) {
+                var pages = modal.getElementsByClassName('page');
+        
+                for (var i = 0; i < pages.length; i++) {
+                    pages[i].style.display = 'none';
+                }
+        
+                pages[pageNumber - 1].style.display = 'block';
+            }
+        
+            showPage(document.getElementById('Student_Add_Modal'), 1);
+        
+            var updateModals = document.querySelectorAll('[id^="UpdateStudentModal"]');
+            updateModals.forEach(function (modal) {
+                modal.addEventListener('show.bs.modal', function () {
+                    resetModal(modal);
+                });
+            });
+        
+            var nextButtons = document.querySelectorAll('.modal-footer .custom-btn');
+            nextButtons.forEach(function (button) {
+                button.addEventListener('click', function () {
+                    handlePageNavigation(button, 1);
+                });
+            });
+        
+            var prevButtons = document.querySelectorAll('.modal-footer .btn-secondary');
+            prevButtons.forEach(function (button) {
+                button.addEventListener('click', function () {
+                    handlePageNavigation(button, -1);
+                });
+            });
+        });
+        
+    </script>
+
+
+{% endblock %}

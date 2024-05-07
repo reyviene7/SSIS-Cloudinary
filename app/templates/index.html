@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+
+{% block title %} Home {% endblock title %}
+
+{% block content %}
+    
+<section class="header">
+    <nav>
+        <a href="{{ url_for('.index') }}"><img src="https://res.cloudinary.com/dzwjjpvdb/image/upload/v1703204632/SSIS_CLOUDINARY/ayt1bemgeyymsjvnpv5s.png"></a>
+        <div class="nav-links">
+            <ul>
+                <li><a href="{{ url_for('.index') }}">HOME</a></li>
+                <li><a href="{{ url_for('.college_db') }}">COLLEGE</a></li>
+                <li><a href="{{ url_for('.course') }}">COURSE</a></li>
+                <li><a href="{{ url_for('.student') }}">STUDENT</a></li>
+            </ul>
+        </div>
+    </nav>
+    <div class="text-box">
+        <h1>Welcome to SSIS</h1>
+        <p>Empowering Education Through Information</p>
+        <a href="{{ url_for('.college_db') }}" class="hero-btn">Visit Here for Information</a>
+    </div>
+</section>
+
+
+{% endblock content %}
