@@ -1,27 +1,192 @@
-{% extends "layout.html" %}
+{% block head%}
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+        integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <link rel="stylesheet" href="../static/css/index.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="icon" href="https://res.cloudinary.com/dzwjjpvdb/image/upload/v1703204632/SSIS_CLOUDINARY/ayt1bemgeyymsjvnpv5s.png" type="image/png">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
+        <title>{{ title }} - Simple Student Information System</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.0/gsap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/ScrollTrigger/1.0.5/ScrollTrigger.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.10.4/ScrollTrigger.min.js"></script>
+{% endblock head %}
+{% block content %}  
+        <section>
+            <nav class="navbar">
+                <div class="logo"><a href="{{ url_for('.index') }}">SSIS</div>
+                    <div class="menu-wrapper">
+                        <ul class="menu">
+                            <li><a href="{{ url_for('.index') }}">HOME</a></li>
+                            <li><a href="{{ url_for('.college_db') }}">COLLEGE</a></li>
+                            <li><a href="{{ url_for('.course') }}">COURSE</a></li>
+                            <li><a href="{{ url_for('.student') }}">STUDENT</a></li>
+                        </ul>
+                    </div>
+            </nav>
+            <div class="wrapper">
+                <div class="video-section">
+                    <div class="video-container">
+                        <video src="https://res.cloudinary.com/dzwjjpvdb/video/upload/v1716110238/Academic_dphq4v.mp4" autoplay loop muted></video>
+                    </div>
+                    <div class="img-container">
+                        <img src="https://res.cloudinary.com/dzwjjpvdb/image/upload/v1716206140/window_iogrdv.png" alt="" class="img">
+                    </div>
 
-{% block title %} Home {% endblock title %}
+                    <div class="text-content">
+                        <div class="img_txt">
+                            <div class="title sm left">
+                                <span>between</span>
+                            </div>
+                            <div class="title bg left">
+                                <span>Reality</span>
+                            </div>
+                            <div class="title bg right n">
+                                <span>&</span>
+                            </div>
+                            <div class="title bg right">
+                                <span>Dream</span>
+                            </div>
+                        </div>
+                    </div>
 
-{% block content %}
+                    <div class="v_container">
+                        <div class="left-side">
+                            <div class="tv">
+                                <div class="bg">Expand</div>
+                                <div class="sm">the</div>
+                                <div class="bg bottom">Boundaries</div>
+                            </div>
+                            <div class="text-container">
+                                <p>
+                                    Education has integrated into almost every aspect of our lives, becoming widespread and diverse.
+                                </p>
+                                <p>
+                                    Yet, we recognize that it remains a fundamental pillar of knowledge and empowerment.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="right-side">
+                            <a href="{{ url_for('.college_db') }}">
+                                <p class="info">Visit Here <br>
+                                for <br>
+                                Information<i class="fa-solid fa-arrow-right-long"></i>
+                                </p>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            gsap.registerPlugin(ScrollTrigger);
+
+            ScrollTrigger.defaults({
+            toggleActions:"play none none reverse"
+            })
+
+
+            gsap.to('.img-container',{
+            scale:52,
+            ease:"ease",
+            scrollTrigger:{
+                trigger:'.video-section',
+                scrub:1,
+                start:"top top",
+                end:"bottom",
+                pin:true
+            }
+            })
+
+
+            gsap.to('.right' ,{
+            autoAlpha:0,
+            x:500,
+            duration:1.5,
+            scrollTrigger:{
+                start:1
+            }
+            })
+            gsap.to('.left' ,{
+            autoAlpha:0,
+            x:-500,
+            duration:1.5,
+            scrollTrigger:{
+                start:1
+            }
+            })
+
+
+            gsap.to('.txt-bottom',{
+            autoAlpha:0,
+            letterSpacing:-10,
+            duration:2,
+            scrollTrigger:{
+                start:2
+            }
+            })
+
+
+            const tl = gsap.timeline();
+
+            tl.from('.left-side div',{
+            y:150,
+            opacity:0,
+            stagger:{
+                amount:.4
+            },
+            delay:.5
+            }).from('.right-side',{opacity:0,duration:2},.5)
+            .to('.wrapper' ,{x:-window.innerWidth})
+
+
+
+            ScrollTrigger.create({
+            animation:tl,
+            trigger:'.wrapper',
+            start:"top top",
+            end:"+=600",
+            scrub:1,
+            pin:true,
+            ease:"ease"
+            })
+
+
+
+            gsap.utils.toArray('.col').forEach(image=>{
+            gsap.fromTo(image,{
+                opacity:.3,
+                x:0
+            },{
+                opacity:1,
+                x:-50,
+                scrollTrigger:{
+                trigger:image,
+                start:"10%",
+                stagger:{
+                    amount:.4
+                }
+                }
+            })
+            })
+
+            const timeline = gsap.timeline();
+
+            timeline.from('.title span' ,{
+            y:150,
+            skewY:7,
+            duration:3
+            }).from('.txt-bottom',{
+            letterSpacing:-10,
+            opacity:0,
+            duration:3
+            })
+        });
+    </script>
     
-<section class="header">
-    <nav>
-        <a href="{{ url_for('.index') }}"><img src="https://res.cloudinary.com/dzwjjpvdb/image/upload/v1703204632/SSIS_CLOUDINARY/ayt1bemgeyymsjvnpv5s.png"></a>
-        <div class="nav-links">
-            <ul>
-                <li><a href="{{ url_for('.index') }}">HOME</a></li>
-                <li><a href="{{ url_for('.college_db') }}">COLLEGE</a></li>
-                <li><a href="{{ url_for('.course') }}">COURSE</a></li>
-                <li><a href="{{ url_for('.student') }}">STUDENT</a></li>
-            </ul>
-        </div>
-    </nav>
-    <div class="text-box">
-        <h1>Welcome to SSIS</h1>
-        <p>Empowering Education Through Information</p>
-        <a href="{{ url_for('.college_db') }}" class="hero-btn">Visit Here for Information</a>
-    </div>
-</section>
-
-
+    
 {% endblock content %}

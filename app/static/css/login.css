@@ -225,3 +225,18 @@ video {
     margin-top: 10px;
     color: #757575;
 }
+
+#flash-message{
+    font-family: "Roboto", sans-serif;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    margin-top: 5px;
+    padding: 8px 15px 8px 15px;
+    background-color: rgb(255, 236, 236);
+    color: rgb(181, 68, 68);
+    border-color: rgb(234, 198, 198);
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 4px;
+}
