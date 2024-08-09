@@ -155,7 +155,7 @@ def course():
 @user_bp.route('/delete_course/<string:course_code>', methods=['DELETE'])
 def delete_course(course_code):
     if request.method == 'DELETE':
-        flash('College has been deleted Successfully!')
+        flash('Course has been deleted Successfully!')
         result = m_course.delete_course(course_code)
         response = jsonify(result)
         return response
@@ -192,6 +192,7 @@ def search_course():
 @user_bp.route('/student', methods=['GET', 'POST'])
 def student():
     courses = m_course.get_courses()
+    colleges = m_student.get_collegelist()
     
     try:
         username = session['username']
@@ -216,21 +217,20 @@ def student():
             if image.filename != '':
                 # Attempt to upload the image
                 image_url = m_student.upload_image(image)
-
                 # If the image upload fails (returns None), flash an error and do not create the student
                 if image_url is None:
                     return redirect(request.url)
-
         # Set the default image URL
         default_image_url = "https://res.cloudinary.com/dzwjjpvdb/image/upload/v1702977617/SSIS_CLOUDINARY/user_profile_fcfymn.jpg"
         if image_url is None:
             image_url = default_image_url
-            
+        
         m_student.add_student(id, firstname, lastname, course, year, gender, image_url)
+        flash('New Student Added.')
 
     students = m_student.get_students()
     print(students)
-    return render_template('student.html', students=students, username=username, title="Student", courses=courses)
+    return render_template('student.html', students=students, username=username, title="Student", courses=courses, colleges=colleges)
 
 @user_bp.route('/delete_student/<string:student_id>', methods=['DELETE'])
 def delete_student(student_id):
@@ -259,6 +259,7 @@ def update_student(student_id):
             new_image_url = m_student.upload_image(new_image)
         else:
             new_image_url = existing_student.get('image_url')
+        flash("Image Successfully Added.")
     else:
         new_image_url = existing_student.get('image_url')
     
@@ -269,7 +270,7 @@ def update_student(student_id):
 @user_bp.route('/search_student', methods=['GET'])
 def search_student():
     courses = m_course.get_courses()
-
+    colleges = m_college.get_colleges()
     if request.method == 'POST':
         search_query = request.form.get('search')
         filter_by = request.form.get('filter_by')
@@ -285,6 +286,8 @@ def search_student():
         students = m_student.search_students_by_lastname(search_query)
     elif filter_by == 'course':
         students = m_student.search_students_by_course(search_query)
+    elif filter_by == 'college':
+        students = m_student.search_students_by_college(search_query)
     elif filter_by == 'year':
         students = m_student.search_students_by_year(search_query)
     elif filter_by == 'gender':
@@ -292,4 +295,4 @@ def search_student():
     else:
         students = m_student.get_students()
     
-    return render_template('student.html', students=students, courses=courses, title="Student",  selected_filter=filter_by)
+    return render_template('student.html', students=students, courses=courses, college=colleges, title="Student",  selected_filter=filter_by)

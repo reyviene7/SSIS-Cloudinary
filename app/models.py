@@ -191,9 +191,30 @@ class m_student:
     @classmethod
     def get_students(cls):
         cur = mysql.new_cursor(dictionary=True)
-        cur.execute("SELECT * FROM student")
-        course = cur.fetchall()
-        return course
+        query = """
+        SELECT 
+        student.id,
+        student.firstname,
+        student.lastname,
+        student.year,
+        student.gender,
+        student.image_url,
+            CONCAT(course_view.course_name, ' - ', course_view.college_code) AS course_and_college
+        FROM 
+                student
+        LEFT JOIN 
+                course_view ON student.course = course_view.course_code
+        """
+        cur.execute(query)
+        students = cur.fetchall()
+        return students
+    
+    @classmethod
+    def get_collegelist(cls):
+        cur = mysql.new_cursor(dictionary=True)
+        cur.execute("SELECT college_code FROM course_view")
+        students = cur.fetchall()
+        return students
     
     @classmethod
     def search_students_by_id(cls, search_query):
@@ -206,7 +227,15 @@ class m_student:
     @classmethod
     def search_students_by_firstname(cls, search_query):
         cur = mysql.new_cursor(dictionary=True)
-        cur.execute("SELECT * FROM student WHERE firstname LIKE %s", (f"%{search_query}%",))
+        query = """
+        SELECT 
+            student.*,
+            CONCAT(course_view.course_name, ' - ', course_view.college_code) AS course_and_college
+        FROM student
+        LEFT JOIN course_view ON student.course = course_view.course_code
+        WHERE student.firstname LIKE %s
+        """
+        cur.execute(query, (f"%{search_query}%",))
         students = cur.fetchall()
         cur.close()
         return students
@@ -214,7 +243,15 @@ class m_student:
     @classmethod
     def search_students_by_lastname(cls, search_query):
         cur = mysql.new_cursor(dictionary=True)
-        cur.execute("SELECT * FROM student WHERE lastname LIKE %s", (f"%{search_query}%",))
+        query = """
+        SELECT 
+            student.*,
+            CONCAT(course_view.course_name, ' - ', course_view.college_code) AS course_and_college
+        FROM student
+        LEFT JOIN course_view ON student.course = course_view.course_code
+        WHERE student.lastname LIKE %s
+        """
+        cur.execute(query, (f"%{search_query}%",))
         students = cur.fetchall()
         cur.close()
         return students
@@ -222,7 +259,30 @@ class m_student:
     @classmethod
     def search_students_by_course(cls, search_query):
         cur = mysql.new_cursor(dictionary=True)
-        cur.execute("SELECT * FROM student WHERE course LIKE %s", (f"%{search_query}%",))
+        query = """
+        SELECT 
+            student.*,
+            CONCAT(course_view.course_name, ' - ', course_view.college_code) AS course_and_college
+        FROM student
+        LEFT JOIN course_view ON student.course = course_view.course_code
+        WHERE course_view.course_name LIKE %s
+        """
+        cur.execute(query, (f"%{search_query}%",))
+        students = cur.fetchall()
+        cur.close()
+        return students
+
+    @classmethod
+    def search_students_by_college(cls, search_query):
+        cur = mysql.new_cursor(dictionary=True)
+        query = """
+        SELECT student.*,
+            CONCAT(course_view.course_name, ' - ', course_view.college_code) AS course_and_college
+        FROM student
+        LEFT JOIN course_view ON student.course = course_view.course_code
+        WHERE course_view.college_code LIKE %s
+        """
+        cur.execute(query, (f"%{search_query}%",))
         students = cur.fetchall()
         cur.close()
         return students
@@ -304,7 +364,6 @@ class m_student:
             else:
                 flash("Invalid file type. Please upload a valid image file (allowed types: png, jpg, jpeg).", "error")
                 return None
-
         except Exception as e:
             flash("Failed to upload image. Please try again.", "error")
             return None

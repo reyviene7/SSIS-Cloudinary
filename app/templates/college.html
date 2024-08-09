@@ -94,11 +94,11 @@
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <div class="form-group">
                             <label for="collegeCode">College Code</label>
-                            <input type="text" class="form-control" id="code" name="code" autocomplete="off" placeholder="Enter College Code">
+                            <input type="text" class="form-control" id="code" name="code" autocomplete="off" placeholder="Enter College Code" required>
                         </div>
                         <div class="form-group">
                             <label for "collegeName">Name of College</label>
-                            <input type="text" class="form-control" id="name" name="name" autocomplete="off" placeholder="Enter Name of College">
+                            <input type="text" class="form-control" id="name" name="name" autocomplete="off" placeholder="Enter Name of College" required>
                         </div>
                         <div class="modal-footer">
                             <button type="submit" form="college_form" class="btn custom-btn">Add</button>

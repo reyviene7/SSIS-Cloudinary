@@ -17,6 +17,7 @@
                             <option value="firstname" {% if selected_filter == 'firstname' %}selected{% endif %}>First Name</option>
                             <option value="lastname" {% if selected_filter == 'lastname' %}selected{% endif %}>Last Name</option>
                             <option value="course" {% if selected_filter == 'course' %}selected{% endif %}>Course</option>
+                            <option value="college" {% if selected_filter == 'college' %}selected{% endif %}>College</option>
                             <option value="year" {% if selected_filter == 'year' %}selected{% endif %}>Year</option>
                             <option value="gender" {% if selected_filter == 'gender' %}selected{% endif %}>Gender</option>
                         </select>
@@ -64,7 +65,7 @@
                     <th>ID</th>
                     <th>Firstname</th>
                     <th>Lastname</th>
-	                <th>Course</th>
+                    <th>Course & College</th>
 	                <th>Year</th>
 	                <th>Gender</th>
 	                <th>Option</th>
@@ -78,7 +79,7 @@
 			            <td>{{student.id }}</td>
                         <td>{{student.firstname }}</td>
                         <td>{{student.lastname }}</td>
-                        <td>{{student.course }}</td>
+                        <td>{{student.course_and_college }}</td>
                         <td>{{student.year }}</td>
                         <td>{{student.gender }}</td>
                         <td>
@@ -134,7 +135,6 @@
                                         <option value="2nd year">2nd year</option>
                                         <option value="3rd year">3rd year</option>
                                         <option value="4th year">4th year</option>
-                                        <option value="Other">Other</option>
                                     </select>
                                 </div>
                                 <div class="form-group mb-3">
@@ -143,11 +143,10 @@
                                         <option disabled selected value="">--Select Gender--</option>
                                         <option value="Male">Male</option>
                                         <option value="Female">Female</option>
-                                        <option value="Other">Other</option>   
                                     </select>
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn custom-btn" onclick="showPage(2)">Next</button>
+                                    <button type="button" class="btn custom-btn" id="next-button" onclick="showPage(2)">Next</button>
                                 </div>
                             </div>
                             <div class="page" id="page2" style="display: none;">
@@ -210,7 +209,6 @@
                                 <option value="2nd year" {% if student.year == "2nd year" %}selected{% endif %}>2nd year</option>
                                 <option value="3rd year" {% if student.year == "3rd year" %}selected{% endif %}>3rd year</option>
                                 <option value="4th year" {% if student.year == "4th year" %}selected{% endif %}>4th year</option>
-                                <option value="Other" {% if student.year == "Other" %}selected{% endif %}>Other</option>
                             </select>
                         </div>
                         <div class="form-group mb-3">
@@ -248,6 +246,9 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            const studentAddModal = document.getElementById('Student_Add_Modal');
+            const studentIdField = document.getElementById('id');
+            const nextButton = document.getElementById('next-button');
             function handlePageNavigation(button, increment) {
                 var modal = button.closest('.modal');
                 var currentPage = parseInt(modal.getAttribute('data-page')) || 1; 
@@ -257,6 +258,25 @@
                 modal.setAttribute('data-page', nextPage);
             }
         
+            function validateStudentId() {
+                const studentId = studentIdField.value;
+                const idPattern = /^20\d{2}-\d{4}$/;
+                const isValidId = idPattern.test(studentId);
+        
+                if (!isValidId) {
+                    studentIdField.classList.add('is-invalid');
+                } else {
+                    studentIdField.classList.remove('is-invalid');
+                }
+                nextButton.disabled = !isValidId;
+            }
+        
+            // Initialize the first page display in the Add Student modal
+            showPage(studentAddModal, 1);
+        
+            // Validate the ID field on input
+            studentIdField.addEventListener('input', validateStudentId);
+
             function resetModal(modal) {
                 var nextButtons = modal.querySelectorAll('.modal-footer .custom-btn');
                 nextButtons.forEach(function (button) {
@@ -298,6 +318,7 @@
                     handlePageNavigation(button, -1);
                 });
             });
+            validateStudentId();
         });
         
     </script>
